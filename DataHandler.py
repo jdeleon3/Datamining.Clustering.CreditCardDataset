@@ -1,16 +1,11 @@
 import pandas as pd
-from Visualizer import Visualizer
+from visualizer import Visualizer
 from sklearn.preprocessing import StandardScaler
 import os
 
 pd.set_option('display.max_columns', None)
 
 class DataHandler():
-
-    def __generate_missing_df__(self):
-        self.df_missing = self.df.isnull().sum()
-        self.df_missing = self.df_missing[self.df_missing > 0]
-        self.visualizer = Visualizer(self.df)        
 
     def __init__(self, filepath: str):        
         self.filepath = filepath
@@ -21,9 +16,23 @@ class DataHandler():
         else:
             raise Exception('Filepath is not valid')
         
-
+    def __generate_missing_df__(self):
+        self.df_missing = self.df.isnull().sum()
+        self.df_missing = self.df_missing[self.df_missing > 0]
+        self.visualizer = Visualizer(self.df)     
+        
     def get_data(self):
         return self.df
+    
+    def print_missing_values(self):
+        print("Columns with missing values: ")
+        print(self.df_missing)
+        print("\n\n")
+
+    def print_data_info(self):
+        print("Data Info: ")
+        print(self.df.info())
+        print("\n\n")
     
     def inspect_data(self):
         print(self.df.head())
@@ -38,7 +47,7 @@ class DataHandler():
 
     def clean_data(self):
         self.df.drop(columns=['CUST_ID'], inplace=True)
-        self.df.fillna(self.df.mean(), inplace=True)
+        self.df.fillna(self.df.median(), inplace=True)
         self.df.drop_duplicates(inplace=True)
         self.__generate_missing_df__()
         self.visualizer.df = self.df

@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+from numpy import ndarray
 
 class Visualizer:
 
@@ -17,6 +18,8 @@ class Visualizer:
         if os.path.exists(filename):
             os.remove(filename)
         figure.savefig(filename)
+        figure.clear()
+        plt.close()
 
     def plot_boxplots(self):
         for column in self.df.columns:
@@ -40,9 +43,9 @@ class Visualizer:
         plt.savefig(filename)
         plt.close()
     
-    def plot_elbow_curve(self, inertia_values: list):
+    def plot_elbow_curve(self, inertia_values: list, min_clusters: int = 2):
         plt.figure(figsize=(10, 5))
-        plt.plot(range(2, len(inertia_values) + 2), inertia_values, marker='o')
+        plt.plot(range(min_clusters, len(inertia_values) + min_clusters), inertia_values, marker='o')
         plt.xlabel('Number of Clusters')
         plt.ylabel('Inertia')
         plt.title('Elbow Curve')
@@ -52,7 +55,7 @@ class Visualizer:
             os.remove(filename)
         plt.savefig(filename)
         plt.close()
-
+    
     def plot_silhouette_score(self, silhouette_values: list):
         plt.figure(figsize=(10, 5))
         plt.plot(range(2, len(silhouette_values) + 2), silhouette_values, marker='o')
@@ -69,6 +72,7 @@ class Visualizer:
     def plot_clusters(self, pca_data: pd.DataFrame, cluster_labels: list):
         plt.figure(figsize=(10, 5))
         plt.scatter(pca_data[:, 0], pca_data[:, 1], c=cluster_labels, cmap='viridis')
+        
         plt.title('PCA - Cluster Visualization')
         #plt.show() 
         plt.savefig('./images/cluster_visualization.png')       

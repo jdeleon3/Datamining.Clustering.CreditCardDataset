@@ -1,5 +1,5 @@
-from Cluster import Cluster
-from DataHandler import DataHandler
+from cluster import Cluster
+from datahandler import DataHandler
 import os
 import glob
 
@@ -16,10 +16,11 @@ if os.path.exists('./data/clustered_data.csv'):
 # Load the data, clean it, standardize it, and cluster it
 filename = './data/CC GENERAL.csv'
 dh = DataHandler(filename)
+dh.print_missing_values()
+dh.print_data_info()
 dh.clean_data()
 dh.inspect_data()
 dh.standardize_data()
-dh.inspect_data()
 cluster = Cluster(dh.get_data())
 cluster.elbow_curve(10)
 cluster.silhouette_score(10)

@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import davies_bouldin_score
 from sklearn.decomposition import PCA
-from Visualizer import Visualizer
-from sklearn.preprocessing import StandardScaler
+from visualizer import Visualizer
+
 
 class Cluster:
     
@@ -20,7 +20,7 @@ class Cluster:
             kmeans.fit(self.df)
             inertia_values.append(kmeans.inertia_)
         self.visualizer.plot_elbow_curve(inertia_values)
-
+    
     def silhouette_score(self, max_clusters: int):
         silhouette_values = []
         for i in range(2, max_clusters):
@@ -37,16 +37,34 @@ class Cluster:
         centroids = kmeans.cluster_centers_
         centroids = pd.DataFrame(centroids, columns=self.df.columns.difference(['cluster']))
         centroids.to_csv('./data/centroids.csv')
-        print("Centroids: ")
+        print("\n\nCentroids: ")
         print(self.df.columns)
-        print(centroids)        
+        print(centroids)
 
+        
+        print("\n\nCluster Distribution: ")
+        print(self.df['cluster'].value_counts())
+
+        # Use PCA to reduce the dimensions to 2 for visualization
         pca = PCA(n_components=2)
         pca_data = pca.fit_transform(self.df)
         self.visualizer.plot_clusters(pca_data, kmeans.labels_)                
         db_index = davies_bouldin_score(self.df, kmeans.labels_)
-        print(f'Davies-Bouldin Index: {db_index}')
+
+        print(f'\n\nDavies-Bouldin Index: {db_index}')
         self.df.to_csv('./data/clustered_data.csv', index=False)
+ 
+    def elbow_curve_with_minimum_itemcount(self, max_clusters: int, min_itemcount: int):
+        inertia_values = []
+        for i in range(max_clusters, 0, -1):            
+            kmeans = KMeans(n_clusters=i)
+            kmeans.fit(self.df)
+            df_temp = pd.DataFrame(kmeans.labels_)
+            if(df_temp[0].value_counts().min() >= min_itemcount):
+                inertia_values.append(kmeans.inertia_)
+        inertia_values.reverse()
+        self.visualizer.plot_elbow_curve(inertia_values, min_clusters=1)
+            
 
 if __name__ == '__main__':
     df = pd.read_csv('./data/CC GENERAL.csv')
